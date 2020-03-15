@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const Button = (props) => {
+export const SearchForm = (props) => {
     let styles = {
       position: 'absolute',
       zIndex: '100',
@@ -10,6 +10,6 @@ export const Button = (props) => {
       fontSize: '15px'
     };
     return (
-      <button style={styles} onClick={props.changeBasemap}>VAHETA ALUSKAARTI</button>
+      
     )
 }

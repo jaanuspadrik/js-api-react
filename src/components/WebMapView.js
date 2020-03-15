@@ -5,21 +5,58 @@ import './WebMapView.css';
 
 export const WebMapView = () => {
     const mapRef = useRef();
-    const [basemap, setBasemap] = useState('streets');
+    const [basemap, setBasemap] = useState('Hallkaart');
 
     useEffect(
       () => {
-        loadModules(['esri/Map', 'esri/views/MapView'], { css: true })
-        .then(([Map, MapView]) => {
+        loadModules(['esri/Map', 'esri/Basemap', 'esri/layers/WMSLayer', 'esri/views/MapView'], { css: true })
+        .then(([Map, Basemap, WMSLayer, MapView]) => {
+          var Orto = new WMSLayer ({
+            url: "https://kaart.maaamet.ee/wms/fotokaart?service=WMS&version=1.3.0&request=GetCapabilities",
+            title: "Ortofoto",
+            listMode: "hide-children",
+            visible: true,
+            opacity: 0.7,
+            sublayers: [{
+              name: "EESTIFOTO"
+            }]
+          });
+
+          var Hallkaart = new WMSLayer ({
+            url: "https://kaart.maaamet.ee/wms/hallkaart?service=WMS&version=1.3.0&request=GetCapabilities",
+            title: "Maa-ameti Hallkaart",
+            listMode: "hide-children",
+            visible: true
+          });
+
+          var Aluskaart = new Basemap({
+            baseLayers: [eval(basemap)],
+            title: "Aluskaart"
+          });
+
           const map = new Map({
-            basemap: `${basemap}`
+            basemap: Aluskaart
           });
 
           const view = new MapView({
             container: mapRef.current,
             map: map,
-            center: [-118, 34],
-            zoom: 8
+            spatialReference: {
+              wkid: 3301
+            },
+            scale: 10000,
+            /*extent: {
+              xmin: 6617000,
+              ymin: 375500,
+              xmax: 6378500,
+              ymax: 737000,
+              spatialReference: 3301
+            },*/
+            center: {
+              y: 6443466.43,
+              x: 697004.90,
+              spatialReference: 3301
+            }
           });
 
           return () => {
@@ -33,10 +70,10 @@ export const WebMapView = () => {
     );
 
     let changeBasemap = () => {
-      if (basemap == 'streets') {
-        setBasemap('topo-vector')
+      if (basemap == 'Orto') {
+        setBasemap('Hallkaart')
       } else {
-        setBasemap('streets')
+        setBasemap('Orto')
       }
 
     }

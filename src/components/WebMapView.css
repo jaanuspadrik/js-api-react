@@ -1,0 +1,12 @@
+.ümbris {
+  padding: 0;
+  margin: 0;
+  height: 100vh;
+  width: 100%;
+}
+
+.webmap {
+  width: 100%;
+  height: 100vh;
+  bottom: 0px;
+}

@@ -1,16 +1,39 @@
 import React, { Component, useEffect, useRef, useState } from 'react';
 import {Button} from './Button';
+import {SearchForm} from './SearchForm';
 import { loadModules } from 'esri-loader';
+import Tingimused from '../Tingimused';
 import './WebMapView.css';
 
 export const WebMapView = () => {
     const mapRef = useRef();
     const [basemap, setBasemap] = useState('Hallkaart');
+    const [location, setLocation] = useState({});
+    const [tingimused, setTingimused] = useState(Tingimused);
+
+    let getLocation = async (event) => {
+      event.preventDefault();
+      const aadress = event.target.elements.location.value;
+      if (aadress) {
+        const api_call = await fetch(`http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?SingleLine=${aadress}&f=json&outSR=%7B%22wkid%22%3A3301%7D&outFields=Addr_type&countryCode=EST`);
+        const data = await api_call.json();
+        const asukoht = data.candidates[0];
+        setLocation(asukoht);
+        document.getElementById("valik").reset();
+      }
+    };
+
+    let leiaJuhtotstarve = (tähis) => {
+      return tingimused.find(function(juhtotstarve){
+        return juhtotstarve.tähis === tähis
+      })
+    };
 
     useEffect(
       () => {
-        loadModules(['esri/Map', 'esri/Basemap', 'esri/layers/WMSLayer', 'esri/views/MapView'], { css: true })
-        .then(([Map, Basemap, WMSLayer, MapView]) => {
+        console.log(location);
+        loadModules(['esri/Map', 'esri/Basemap', 'esri/layers/WMSLayer', 'esri/layers/FeatureLayer', 'esri/views/MapView', 'esri/Graphic'], { css: true })
+        .then(([Map, Basemap, WMSLayer, FeatureLayer, MapView, Graphic]) => {
           var Orto = new WMSLayer ({
             url: "https://kaart.maaamet.ee/wms/fotokaart?service=WMS&version=1.3.0&request=GetCapabilities",
             title: "Ortofoto",
@@ -45,23 +68,61 @@ export const WebMapView = () => {
               wkid: 3301
             },
             scale: 10000,
-            /*extent: {
-              xmin: 6617000,
-              ymin: 375500,
-              xmax: 6378500,
-              ymax: 737000,
-              spatialReference: 3301
-            },*/
             center: {
-              y: 6443466.43,
-              x: 697004.90,
+              y: 6479014.93,
+              x: 661563.17,
               spatialReference: 3301
             }
           });
+          const Maakasutus = new FeatureLayer({
+            url: "http://maps.hendrikson.ee/arcgis/rest/services/Hosted/Planeeritav_maakasutus_Tartu_vald_test/FeatureServer/0",
+            visible: false
+          });
+          map.add(Maakasutus);
+
+          if (location.location) {
+            const marker = new Graphic({
+              attributes: {
+                aadress: location.address
+              },
+              popupTemplate: {
+                title: "{aadress}"
+              },
+              geometry: {
+                type: "point",
+                spatialReference: {
+                  wkid: 3301
+                },
+                x: location.location.x,
+                y: location.location.y
+              },
+              symbol: {
+                type: "simple-marker",
+                color: [226, 119, 40]
+              }
+            });
+            view.graphics.add(marker);
+            view.popup.location = {
+              x: location.location.x,
+              y: location.location.y,
+              spatialReference: 3301
+            };
+            view.popup.features = [marker];
+            view.goTo(marker, {duration: 700});
+            view.when(function(){
+              view.popup.visible = true
+            })
+
+            const päring = Maakasutus.createQuery();
+            päring.geometry = marker.geometry;
+            Maakasutus.queryFeatures(päring).then(function(results){
+              var tulemus = leiaJuhtotstarve(results.features[0].attributes.maakasutus);
+              console.log(tulemus)
+            });
+          };
 
           return () => {
             if (view) {
-              // destroy the map view
               view.container = null;
             }
           };
@@ -70,12 +131,11 @@ export const WebMapView = () => {
     );
 
     let changeBasemap = () => {
-      if (basemap == 'Orto') {
+      if (basemap === 'Orto') {
         setBasemap('Hallkaart')
       } else {
         setBasemap('Orto')
       }
-
     }
 
     return (
@@ -83,6 +143,9 @@ export const WebMapView = () => {
         <div className="ümbris">
           <div className="webmap" ref={mapRef}></div>
           <Button changeBasemap={changeBasemap}/>
+          <SearchForm
+            getLocation={getLocation}
+          />
         </div>
       </>
     )

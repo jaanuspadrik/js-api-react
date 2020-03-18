@@ -1,0 +1,13 @@
+.search {
+  position: absolute;
+  width: 80px;
+  z-index: 100;
+  left: 20px;
+  bottom: 80px;
+  font-size: 15px;
+  margin-bottom: 20px
+}
+
+#valik {
+  display: flex;
+}

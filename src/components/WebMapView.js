@@ -102,12 +102,12 @@ export const WebMapView = () => {
               }
             });
             view.graphics.add(marker);
-            view.popup.location = {
+            /*view.popup.location = {
               x: location.location.x,
               y: location.location.y,
               spatialReference: 3301
             };
-            view.popup.features = [marker];
+            view.popup.features = [marker];*/
             view.goTo(marker, {duration: 700});
             view.when(function(){
               view.popup.visible = true
@@ -116,8 +116,37 @@ export const WebMapView = () => {
             const päring = Maakasutus.createQuery();
             päring.geometry = marker.geometry;
             Maakasutus.queryFeatures(päring).then(function(results){
-              var tulemus = leiaJuhtotstarve(results.features[0].attributes.maakasutus);
-              console.log(tulemus)
+              let tulemus = leiaJuhtotstarve(results.features[0].attributes.maakasutus.tingimused);
+              function makeUL(arr) {
+                // Create the list element:
+                var list = document.createElement('ul');
+                arr.forEach(tingimus => {
+                    // Create the list item:
+                    var item = document.createElement('li');
+                    // Set its contents:
+                    item.appendChild(document.createTextNode(tingimus));
+                    // Add it to the list:
+                    list.appendChild(item);
+                })
+                // Finally, return the constructed list:
+                return list;
+              };
+              console.log(makeUL(tulemus));
+              view.popup = {
+                title: "Maakasutus: ",
+                content: "makeUL(tulemus)",
+                actions: [],
+                collapsed: false,
+                dockEnabled: true,
+                autoOpenEnabled: true,
+                dockOptions: {
+                  breakpoint: false,
+                  buttonEnabled: false,
+                  collapseEnabled: false,
+                  position: "bottom-right"
+                }
+              };
+              console.log(view.popup)
             });
           };
 

@@ -5,7 +5,7 @@ export const SearchForm = (props) => {
     return (
       <div className="search">
         <form id="valik" onSubmit={props.getLocation}>
-          <input type="text" name="location" autoComplete="off"/>
+          <input type="text" name="location"/>
           <input type="submit" value="Otsi" />
         </form>
       </div>

@@ -15,7 +15,7 @@ export const WebMapView = () => {
       event.preventDefault();
       const aadress = event.target.elements.location.value;
       if (aadress) {
-        const api_call = await fetch(`http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?SingleLine=${aadress}&f=json&outSR=%7B%22wkid%22%3A3301%7D&outFields=Addr_type&countryCode=EST`);
+        const api_call = await fetch(`http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?SingleLine=${aadress}%22Tartu%22vald&f=json&outSR=%7B%22wkid%22%3A3301%7D&outFields=Addr_type&countryCode=EST`);
         const data = await api_call.json();
         const asukoht = data.candidates[0];
         setLocation(asukoht);
@@ -31,9 +31,8 @@ export const WebMapView = () => {
 
     useEffect(
       () => {
-        console.log(location);
-        loadModules(['esri/Map', 'esri/Basemap', 'esri/layers/WMSLayer', 'esri/layers/FeatureLayer', 'esri/views/MapView', 'esri/Graphic'], { css: true })
-        .then(([Map, Basemap, WMSLayer, FeatureLayer, MapView, Graphic]) => {
+        loadModules(['esri/Map', 'esri/Basemap', 'esri/layers/WMSLayer', 'esri/layers/FeatureLayer', 'esri/layers/MapImageLayer', 'esri/views/MapView', 'esri/Graphic'], { css: true })
+        .then(([Map, Basemap, WMSLayer, FeatureLayer, MapImageLayer, MapView, Graphic]) => {
           var Orto = new WMSLayer ({
             url: "https://kaart.maaamet.ee/wms/fotokaart?service=WMS&version=1.3.0&request=GetCapabilities",
             title: "Ortofoto",
@@ -72,15 +71,273 @@ export const WebMapView = () => {
               y: 6479014.93,
               x: 661563.17,
               spatialReference: 3301
+            },
+            popup: {
+              actions: [],
+              collapsed: false,
+              dockEnabled: true,
+              autoOpenEnabled: true,
+              dockOptions: {
+                breakpoint: false,
+                buttonEnabled: false,
+                collapseEnabled: false,
+                position: "bottom-right"
+              }
             }
           });
+          var MaakasutusKaardile = new MapImageLayer({
+            url: "https://maps.hendrikson.ee/arcgis/rest/services/Tartu_vald/Tartu_vald_eskiis/MapServer",
+            title: "Kavandatav maakasutus",
+            opacity: 0.8,
+            sublayers: [
+            {
+              id: 45,
+              popupEnabled: false,
+              title: "Sadama maa-ala (LS)",
+              popupTemplate: {
+                title: "Sadama maa-ala (LS)"
+              }
+            },
+            {
+              id: 44,
+              popupEnabled: false,
+              title: "Kaubandus-, teenindus- ja büroohoonete ning tootmise- ja logistikakeskuse maa-ala (ÄT)",
+              popupTemplate: {
+                title: "Kaubandus-, teenindus- ja büroohoonete ning tootmise- ja logistikakeskuse maa-ala (ÄT)"
+              }
+            },
+            {
+              id: 43,
+              popupEnabled: false,
+              title: "Korterelamu maa-ala (EK)",
+              popupTemplate: {
+                title: "Korterelamu maa-ala (EK)"
+              }
+            },
+            {
+              id: 42,
+              popupEnabled: false,
+              title: "Väikeelamu maa-ala (EV)",
+              popupTemplate: {
+                title: "Väikeelamu maa-ala (EV)"
+              }
+            },
+            {
+              id: 41,
+              popupEnabled: false,
+              title: "Supelranna maa-ala (PR)",
+              popupTemplate: {
+                title: "Supelranna maa-ala (PR)"
+              }
+            },
+            {
+              id: 40,
+              popupEnabled: false,
+              title: "Riigikaitse maa-ala (RR)",
+              popupTemplate: {
+                title: "Riigikaitse maa-ala (RR)"
+              }
+            },
+            {
+              id: 39,
+              popupEnabled: false,
+              title: "Ühiskondliku hoone maa-ala (AA)",
+              popupTemplate: {
+                title: "Ühiskondliku hoone maa-ala (AA)"
+              }
+            },
+            {
+              id: 38,
+              popupEnabled: false,
+              title: "Kaubandus-, teenindus- ja büroohoone maa-ala (Ä)",
+              popupTemplate: {
+                title: "Kaubandus-, teenindus- ja büroohoone maa-ala (Ä)"
+              }
+            },
+            {
+              id: 37,
+              popupEnabled: false,
+              title: "Keskuse maa-ala (C)",
+              popupTemplate: {
+                title: "Keskuse maa-ala (C)"
+              }
+            },
+            {
+              id: 36,
+              popupEnabled: false,
+              title: "Elamu- ning kaubandus-, teenindus- ja büroohoone maa-ala (E/Ä)",
+              popupTemplate: {
+                title: "Elamu- ning kaubandus-, teenindus- ja büroohoone maa-ala (E/Ä)"
+              }
+            },
+            {
+              id: 35,
+              popupEnabled: false,
+              title: "Tehnoehitise maa-ala (OT)",
+              popupTemplate: {
+                title: "Tehnoehitise maa-ala (OT)"
+              }
+            },
+            {
+              id: 34,
+              popupEnabled: false,
+              title: "Ühiskondliku hoone ning kaubandus-, teenindus- ja büroohoone maa-ala (AA/Ä)",
+              popupTemplate: {
+                title: "Ühiskondliku hoone ning kaubandus-, teenindus- ja büroohoone maa-ala (AA/Ä)"
+              }
+            },
+            {
+              id: 33,
+              popupEnabled: false,
+              title: "Lennuvälja maa-ala (LL)",
+              popupTemplate: {
+                title: "Lennuvälja maa-ala (LL)"
+              }
+            },
+            {
+              id: 32,
+              popupEnabled: false,
+              title: "Jäätmekäitluse maa-ala (OJ)",
+              popupTemplate: {
+                title: "Jäätmekäitluse maa-ala (OJ)"
+              }
+            },
+            {
+              id: 31,
+              popupEnabled: false,
+              title: "Aianduse maa-ala (AM)",
+              popupTemplate: {
+                title: "Aianduse maa-ala (AM)"
+              }
+            },
+            {
+              id: 30,
+              popupEnabled: false,
+              title: "Kalmistu maa-ala (K)",
+              popupTemplate: {
+                title: "Kalmistu maa-ala (K)"
+              }
+            },
+            {
+              id: 29,
+              popupEnabled: false,
+              title: "Kultuuri- ja spordiasutuse ning kaubandus-, teenindus- ja büroohoone maa-ala (ÜK/Ä)",
+              popupTemplate: {
+                title: "Kultuuri- ja spordiasutuse ning kaubandus-, teenindus- ja büroohoone maa-ala (ÜK/Ä)"
+              }
+            },
+            {
+              id: 28,
+              popupEnabled: false,
+              title: "Liikluse ja liiklust korraldava ehitise maa-ala (LT)",
+              popupTemplate: {
+                title: "Liikluse ja liiklust korraldava ehitise maa-ala (LT)"
+              }
+            },
+            {
+              id: 27,
+              popupEnabled: false,
+              title: "Haljasala (H)",
+              popupTemplate: {
+                title: "Haljasala (H)"
+              }
+            },
+            {
+              id: 26,
+              popupEnabled: false,
+              title: "Väikeelamu- ja ühiskondliku hoone maa-ala (EV/AA)",
+              popupTemplate: {
+                title: "Väikeelamu- ja ühiskondliku hoone maa-ala (EV/AA)"
+              }
+            },
+            {
+              id: 25,
+              popupEnabled: false,
+              title: "Kaubandus-, teenindus- ja büroohoone ning väikeelamu maa-ala (EV/Ä)",
+              popupTemplate: {
+                title: "Kaubandus-, teenindus- ja büroohoone ning väikeelamu maa-ala (EV/Ä)"
+              }
+            },
+            {
+              id: 24,
+              popupEnabled: false,
+              title: "Kaubandus-, teenindus- ja büroohoone ning korterelamu maa-ala (EK/Ä)",
+              popupTemplate: {
+                title: "Kaubandus-, teenindus- ja büroohoone ning korterelamu maa-ala (EK/Ä)"
+              }
+            }]
+          });
+
+          var MKTähised = new FeatureLayer({
+            url: "https://maps.hendrikson.ee/arcgis/rest/services/Tartu_vald/Tartu_vald_MK_tähised/MapServer/0",
+            title: "Maakasutuse tähised",
+            legendEnabled: false,
+            minScale: 20000,
+            labelingInfo: {
+              symbol: {
+                type: "text",
+                color: "black",
+                haloColor: "white",
+                haloSize: "1px",
+                font: {
+                  family: "Montserrat",
+                  size: 8,
+                  weight: "normal"
+                }
+              },
+              labelPlacement: "center-center",
+              labelExpressionInfo: {
+                expression: "$feature.TextString"
+              }
+            },
+            renderer: {
+              type: "simple",
+              symbol: {
+                type: "simple-marker",
+                color: "white",
+                size: 0,
+                outline: {
+                  color: [0, 0, 0, 0.1],
+                  width: 0.5
+                }
+              }
+            }
+          });
+
+          function popupContent(feature) {
+            let tulemus = leiaJuhtotstarve(feature.graphic.attributes.maakasutus);
+            let tingimused = tulemus.tingimused;
+            function makeUL(arr) {
+              var list = document.createElement('ul');
+              arr.forEach(tingimus => {
+                  var item = document.createElement('li');
+                  item.appendChild(document.createTextNode(tingimus.kirjeldus));
+                  list.appendChild(item);
+              });
+              return list.outerHTML
+            };
+            return makeUL(tingimused)
+          }
+          function popupTitle(feature) {
+            let tulemus = leiaJuhtotstarve(feature.graphic.attributes.maakasutus);
+            return `Maakasutus: ${tulemus.juhtotstarve} (${tulemus.tähis})`
+          }
           const Maakasutus = new FeatureLayer({
             url: "http://maps.hendrikson.ee/arcgis/rest/services/Hosted/Planeeritav_maakasutus_Tartu_vald_test/FeatureServer/0",
-            visible: false
+            visible: true,
+            outFields: ["*"],
+            opacity: 0,
+            popupTemplate: {
+              title: popupTitle,
+              content: popupContent
+            }
           });
+          map.add(MaakasutusKaardile);
+          map.add(MKTähised);
           map.add(Maakasutus);
 
           if (location.location) {
+            let aadressiKomponendid = location.address.split(', ');
             const marker = new Graphic({
               attributes: {
                 aadress: location.address
@@ -97,44 +354,44 @@ export const WebMapView = () => {
                 y: location.location.y
               },
               symbol: {
-                type: "simple-marker",
-                color: [226, 119, 40]
+                type: "picture-marker",
+                 url: "./pin.svg",
+                 width: 38,
+                 height: 28,
+                 xoffset: 0,
+                 yoffset: 10
               }
             });
             view.graphics.add(marker);
-            /*view.popup.location = {
-              x: location.location.x,
-              y: location.location.y,
-              spatialReference: 3301
-            };
-            view.popup.features = [marker];*/
             view.goTo(marker, {duration: 700});
-            view.when(function(){
-              view.popup.visible = true
-            })
 
             const päring = Maakasutus.createQuery();
             päring.geometry = marker.geometry;
             Maakasutus.queryFeatures(päring).then(function(results){
-              let tulemus = leiaJuhtotstarve(results.features[0].attributes.maakasutus.tingimused);
-              function makeUL(arr) {
-                // Create the list element:
-                var list = document.createElement('ul');
-                arr.forEach(tingimus => {
-                    // Create the list item:
-                    var item = document.createElement('li');
-                    // Set its contents:
-                    item.appendChild(document.createTextNode(tingimus));
-                    // Add it to the list:
-                    list.appendChild(item);
-                })
-                // Finally, return the constructed list:
-                return list;
-              };
-              console.log(makeUL(tulemus));
+              function popupContent() {
+                if (results.features.length) {
+                  let tulemus = leiaJuhtotstarve(results.features[0].attributes.maakasutus);
+                  let tingimused = tulemus.tingimused;
+                  function makeUL(arr) {
+                    var list = document.createElement('ul');
+                    arr.forEach(tingimus => {
+                        var item = document.createElement('li');
+                        item.appendChild(document.createTextNode(tingimus.kirjeldus));
+                        list.appendChild(item);
+                    });
+                    return list.outerHTML
+                  };
+                  return `Maakasutus: ${tulemus.juhtotstarve} (${tulemus.tähis})` + makeUL(tingimused)
+                } else {
+                  return "Hajaasustusega ala<br>Tingimused on järgnevad:"
+                }
+              }
+
+
               view.popup = {
-                title: "Maakasutus: ",
-                content: "makeUL(tulemus)",
+                title: aadressiKomponendid[0] + ", " + aadressiKomponendid[2],
+                content: String(popupContent()),
+                visible: true,
                 actions: [],
                 collapsed: false,
                 dockEnabled: true,
@@ -146,7 +403,6 @@ export const WebMapView = () => {
                   position: "bottom-right"
                 }
               };
-              console.log(view.popup)
             });
           };
 
